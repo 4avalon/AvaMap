@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AvaMap - Árvore de Projetos</title>
+    <link rel="stylesheet" href="css/tree.css">
+</head>
+<body>
+    <header>
+        <h1>AvaMap - Árvore de Projetos</h1>
+    </header>
+    <main>
+        <!-- Container da árvore -->
+        <section id="tree-container" class="tree-container">
+            <h2>Estrutura de Arquivos</h2>
+            <ul id="project-tree"></ul>
+        </section>
+
+        <!-- Visualização do conteúdo -->
+        <section id="file-viewer" class="file-viewer">
+            <h2>Conteúdo do Arquivo</h2>
+            <pre id="file-content">Selecione um arquivo para visualizar o conteúdo.</pre>
+            <button id="copy-button">Copiar Conteúdo</button>
+        </section>
+    </main>
+
+    <script src="js/tree.js" defer></script>
+</body>
+</html>

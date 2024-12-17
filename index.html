@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AvaMap - Projetos</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <h1>AvaMap - Selecione um Projeto</h1>
+    </header>
+    <main>
+        <div id="project-container">
+            <p>Carregando lista de projetos...</p>
+        </div>
+    </main>
+    <script>
+        // Carrega os projetos do backend e cria a interface
+       async function loadProjects() {
+    const container = document.getElementById('project-container');
+    try {
+        const response = await fetch('/api/projects');
+        if (!response.ok) throw new Error('Erro ao buscar projetos.');
+
+        const projects = await response.json();
+        container.innerHTML = ''; // Limpa o container
+        projects.forEach(project => {
+            const projectCard = document.createElement('div');
+            projectCard.className = 'project-card';
+            projectCard.innerHTML = `
+                <h3>${project.name}</h3>
+                <button onclick="openProject('${project.name}')">Abrir</button>
+            `;
+            container.appendChild(projectCard);
+        });
+    } catch (error) {
+        console.error('Erro:', error);
+        container.innerHTML = '<p>Erro ao carregar os projetos.</p>';
+    }
+}
+
+function openProject(name) {
+    window.location.href = `tree.html?project=${name}`;
+}
+
+// Inicializa
+document.addEventListener('DOMContentLoaded', loadProjects);
+
+    </script>
+</body>
+</html>

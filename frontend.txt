@@ -1,0 +1,381 @@
+// frontend\css\styles.css
+
+
+
+
+// frontend\css\theme.css
+
+
+
+
+// frontend\css\tree.css
+
+/* Estilos gerais */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f5f5f5;
+}
+
+header {
+    background-color: #4CAF50;
+    color: white;
+    text-align: center;
+    padding: 1em 0;
+}
+
+h1, h2 {
+    margin: 0;
+}
+
+main {
+    display: flex;
+    gap: 20px;
+    padding: 20px;
+}
+
+/* Árvore de arquivos */
+.tree-container {
+    width: 40%;
+    background-color: white;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+ul {
+    list-style-type: none;
+    padding-left: 20px;
+}
+
+li {
+    margin: 5px 0;
+    cursor: pointer;
+}
+
+li.file {
+    color: gray;
+}
+
+li.file.selected {
+    color: green;
+    font-weight: bold;
+}
+
+/* Visualizador */
+.file-viewer {
+    width: 60%;
+    background-color: white;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    background-color: #f0f0f0;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    height: 300px;
+    overflow: auto;
+}
+
+button {
+    margin-top: 10px;
+    padding: 5px 10px;
+    cursor: pointer;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 3px;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+
+
+// frontend\js\data.js
+
+// data.js - Dados simulados dos projetos
+
+/**
+ * Retorna a lista de projetos disponíveis.
+ * @returns {Array} Lista de projetos com nome, descrição e caminho.
+ */
+export function getProjectData() {
+    return [
+        {
+            name: "Avalume",
+            description: "Projeto principal com funcionalidades de backend e frontend organizados.",
+            path: "./Avalume/"
+        },
+        {
+            name: "SwordPixelArt",
+            description: "Ferramenta para manipular e converter imagens para pixel art.",
+            path: "./SwordPixelArt/"
+        },
+        {
+            name: "AvaMap",
+            description: "Mapa interativo dos projetos organizados da Avalon.",
+            path: "./AvaMap/"
+        }
+    ];
+}
+
+
+
+// frontend\js\loader.js
+
+// frontend/js/core/loader.js
+import { getProjectData } from './data.js';
+
+/**
+ * Carrega e renderiza o mapa de projetos estáticos.
+ * @param {HTMLElement} container - Elemento onde o mapa será renderizado.
+ */
+export function loadProjectMap(container) {
+    console.log('[AvaMap] Buscando dados dos projetos...');
+    const projects = getProjectData();
+
+    if (!projects || projects.length === 0) {
+        console.warn('[AvaMap] Nenhum projeto encontrado.');
+        container.innerHTML = '<p>Nenhum projeto disponível no momento.</p>';
+        return;
+    }
+
+    container.innerHTML = ''; // Limpa o container
+    projects.forEach(project => {
+        const projectElement = document.createElement('div');
+        projectElement.className = 'project-card';
+        projectElement.innerHTML = `
+            <h3>${project.name}</h3>
+            <p>${project.description}</p>
+            <button onclick="alert('Abrindo ${project.name}')">Abrir</button>
+        `;
+        container.appendChild(projectElement);
+    });
+    console.log('[AvaMap] Mapa de projetos carregado com sucesso!');
+}
+
+/**
+ * Carrega a lista de projetos disponíveis no backend.
+ */
+export async function loadProjectList() {
+    const projectContainer = document.getElementById('project-list');
+
+    try {
+        const response = await fetch('/api/projects');
+        if (!response.ok) throw new Error('Erro ao carregar a lista de projetos.');
+
+        const projects = await response.json();
+        projectContainer.innerHTML = ''; // Limpa o container
+
+        projects.forEach((project) => {
+            const projectItem = document.createElement('div');
+            projectItem.className = 'project-item';
+            projectItem.innerHTML = `
+                <h3>${project.name}</h3>
+                <button onclick="loadProjectTree('${project.name}')">Abrir</button>
+            `;
+            projectContainer.appendChild(projectItem);
+        });
+    } catch (error) {
+        console.error('Erro:', error);
+        projectContainer.innerHTML = '<p>Não foi possível carregar os projetos.</p>';
+    }
+}
+
+/**
+ * Carrega a árvore de arquivos de um projeto.
+ */
+export async function loadProjectTree(projectName) {
+    const treeContainer = document.getElementById('tree-container');
+    try {
+        const response = await fetch(`/api/projects/${projectName}/tree`);
+        if (!response.ok) throw new Error('Erro ao carregar a árvore do projeto.');
+
+        const treeData = await response.json();
+        treeContainer.innerHTML = formatTree(treeData);
+    } catch (error) {
+        console.error('Erro:', error);
+        treeContainer.innerHTML = '<p>Não foi possível carregar a árvore do projeto.</p>';
+    }
+}
+
+/**
+ * Formata a árvore em HTML.
+ */
+function formatTree(treeData) {
+    let html = '<ul>';
+    treeData.forEach((item) => {
+        if (item.type === 'directory') {
+            html += `<li>${item.name}/</li>`;
+            html += formatTree(item.children); // Recursão
+        } else {
+            html += `<li>${item.name}</li>`;
+        }
+    });
+    html += '</ul>';
+    return html;
+}
+
+// Inicialização
+document.addEventListener('DOMContentLoaded', loadProjectList);
+
+
+
+// frontend\js\main.js
+
+// main.js - Inicialização principal do AvaMap
+
+import { loadProjectMap } from './loader.js';
+
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('[AvaMap] Inicializando aplicação...');
+    
+    // Seleciona o container principal
+    const projectMapContainer = document.querySelector('#project-map');
+    
+    if (!projectMapContainer) {
+        console.error('[AvaMap] Erro: Container #project-map não encontrado!');
+        return;
+    }
+
+    // Carrega o mapa de projetos
+    console.log('[AvaMap] Carregando mapa de projetos...');
+    loadProjectMap(projectMapContainer);
+});
+
+
+
+// frontend\js\mapHandler.js
+
+
+
+
+// frontend\js\projectHandler.js
+
+
+
+
+// frontend\js\tree.js
+
+// Função principal para carregar a árvore
+async function loadProjectTree(projectName) {
+    const treeContainer = document.getElementById('project-tree');
+    // Modificação no início do JS de tree.html
+const urlParams = new URLSearchParams(window.location.search);
+const projectName = urlParams.get('project');
+
+if (projectName) {
+    console.log(`Carregando árvore do projeto: ${projectName}`);
+    loadTree(projectName); // Chama a função que carrega a árvore
+} else {
+    alert('Nenhum projeto selecionado!');
+}
+
+
+    try {
+        // Faz a requisição para buscar a árvore do projeto
+        const response = await fetch(`/api/projects/${projectName}/tree`);
+        if (!response.ok) throw new Error('Erro ao carregar a árvore do projeto.');
+
+        const treeData = await response.json();
+        treeContainer.innerHTML = ''; // Limpa o container antes de renderizar
+        renderTree(treeData, treeContainer); // Renderiza a árvore
+
+        console.log('[AvaMap] Árvore carregada com sucesso!');
+    } catch (error) {
+        console.error(error);
+        treeContainer.innerHTML = '<p>Erro ao carregar a árvore do projeto.</p>';
+    }
+}
+
+// Função recursiva para renderizar a árvore
+function renderTree(treeData, container) {
+    const ul = document.createElement('ul');
+
+    treeData.forEach((item) => {
+        const li = document.createElement('li');
+        li.textContent = item.name;
+
+        if (item.type === 'directory') {
+            li.className = 'directory';
+            const subContainer = document.createElement('ul');
+            renderTree(item.children, subContainer);
+            li.appendChild(subContainer);
+        } else {
+            li.className = 'file';
+            li.onclick = () => loadFileContent(item);
+        }
+
+        ul.appendChild(li);
+    });
+
+    container.appendChild(ul);
+}
+
+// Função para carregar o conteúdo do arquivo
+async function loadFileContent(file) {
+    const fileContentElement = document.getElementById('file-content');
+    const copyButton = document.getElementById('copy-button');
+
+    try {
+        const response = await fetch(`/api/projects/file?path=${encodeURIComponent(file.path)}`);
+        if (!response.ok) throw new Error('Erro ao carregar o conteúdo do arquivo.');
+
+        const data = await response.json();
+        fileContentElement.textContent = data.content;
+
+      
+
+
+
+// frontend\tree.html
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AvaMap - Árvore de Projetos</title>
+    <link rel="stylesheet" href="css/tree.css">
+</head>
+<body>
+    <header>
+        <h1>AvaMap - Árvore de Projetos</h1>
+    </header>
+    <main>
+        <!-- Container da árvore -->
+        <section id="tree-container" class="tree-container">
+            <h2>Estrutura de Arquivos</h2>
+            <ul id="project-tree"></ul>
+        </section>
+
+        <!-- Visualização do conteúdo -->
+        <section id="file-viewer" class="file-viewer">
+            <h2>Conteúdo do Arquivo</h2>
+            <pre id="file-content">Selecione um arquivo para visualizar o conteúdo.</pre>
+            <button id="copy-button">Copiar Conteúdo</button>
+        </section>
+    </main>
+
+    <script src="js/tree.js" defer></script>
+</body>
+</html>
+
+
+
+// frontend\utils\fileUtils.js
+
+
+
+
+// frontend\utils\projectParser.js
+
+
