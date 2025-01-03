@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<<<<<<< HEAD
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
@@ -48,5 +49,42 @@ function openProject(name) {
 document.addEventListener('DOMContentLoaded', loadProjects);
 
     </script>
+=======
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AvaMap</title>
+  <link rel="icon" href="./frontend/assets/icons/avamap.ico">
+  <link rel="stylesheet" href="./frontend/globals/theme/reset.css">
+  <link rel="stylesheet" href="./frontend/globals/theme/styles.css">
+  <link rel="stylesheet" href="./frontend/globals/theme/theme.css">
+</head>
+<body>
+  <!-- Navbar -->
+  <header id="nav-container"></header>
+            <!-- Containers Globais -->
+  <div id="login-panel">
+  <p>Bem-vindo, <span id="user-name">Usuário</span></p>
+  <button id="logout-button">Sair</button>
+</div>
+
+
+  <div id="search-results-container" style="display: true;">
+    <button id="close-search-dropdown" aria-label="Fechar">&times;</button>
+    <div id="search-results"></div>
+  </div>
+
+
+
+  <!-- Página Principal -->
+  <main id="pages-container"></main>
+
+  <!-- Footer -->
+  <footer id="footer-container"></footer>
+
+  <!-- Scripts -->
+  <script type="module" src="./frontend/core/index.js"></script>
+>>>>>>> 21b85bc (Commit inicial para o projeto AvaMap)
 </body>
 </html>
