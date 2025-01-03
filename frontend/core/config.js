@@ -14,24 +14,11 @@ const config = {
         about: { name: "about", hasJs: false },
     },
     dynamics: {
-        carousel: {
-        name: "carousel",
-        hasJs: true 
-        },
-        form: { 
-            name: "form", 
-            hasJs: true 
-        }, 
-        search: {
-            name: "search",
-            hasJs: true,
-        },
-        login: {
-            name: "login",
-            hasJs: true,
-        }, 
-        
-
+        carousel: { name: "carousel", hasJs: true }, // Componente "carousel", tem JS
+        form: { name: "form", hasJs: true }, // Componente "carousel", tem JS
+        search: { name: "search", hasJs: true }, // Componente "carousel", tem JS
+        login: { name: "login", hasJs: true },                
+        // Outros dinamics podem ser adicionados aqui
     },
 };
 

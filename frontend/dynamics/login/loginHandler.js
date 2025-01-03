@@ -1,57 +1,61 @@
-import { loadComponent } from '../../core/loader.js';
-
-// Gerenciar Login
 function setupLoginEvents() {
-  // Aguarda o carregamento do DOM
-  document.addEventListener("DOMContentLoaded", () => {
-    const loginForm = document.getElementById("loginForm");
-    const loginMessage = document.getElementById("loginMessage");
+    console.log("[setupLoginEvents] Configurando eventos de login...");
 
-    if (!loginForm || !loginMessage) {
-      console.error("Elementos do formulário de login não encontrados no DOM.");
-      return;
+    const loginForm = document.getElementById("loginForm");
+    const userNameElement = document.getElementById("user-name");
+    const loginPanel = document.getElementById("login-panel");
+
+    if (!loginForm || !userNameElement || !loginPanel) {
+        console.error("[LoginHandler] Elementos necessários não encontrados no DOM.");
+        return;
     }
 
-    // Adiciona o evento de submit ao formulário de login
     loginForm.addEventListener("submit", async (event) => {
-      event.preventDefault(); // Evita o reload da página
+        event.preventDefault();
 
-      const username = document.getElementById("username").value;
-      const password = document.getElementById("password").value;
+        const username = document.getElementById("username").value;
+        const password = document.getElementById("password").value;
 
-      try {
-        const response = await fetch("http://localhost:3000/auth/login", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ username, password }),
-        });
+        try {
+            console.log("[LoginHandler] Tentando logar com o backend...");
+            const response = await fetch("http://localhost:3000/auth/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ username, password }),
+            });
 
-        if (!response.ok) {
-          const errorMessage = await response.text();
-          loginMessage.textContent = `Erro: ${errorMessage}`;
-          loginMessage.style.color = "red";
-          return;
+            if (!response.ok) {
+                const errorMessage = await response.text();
+                console.error("[LoginHandler] Erro do servidor:", errorMessage);
+                userNameElement.textContent = "Erro no Login";
+                userNameElement.style.color = "red";
+                return;
+            }
+
+            const data = await response.json();
+            console.log("[LoginHandler] Login bem-sucedido:", data);
+
+            // Verifica se o backend retornou o campo `username`
+            const userName = data.username || (data.message && data.message.split(",")[1]?.trim()) || "Usuário";
+            if (userName) {
+                userNameElement.textContent = userName;
+                userNameElement.style.color = "green";
+                loginPanel.style.display = "block";
+            } else {
+                console.error("[LoginHandler] Nome do usuário não encontrado.");
+                userNameElement.textContent = "Erro: Nome não encontrado";
+                userNameElement.style.color = "red";
+            }
+
+        } catch (error) {
+            console.error("[LoginHandler] Erro ao conectar ao backend:", error);
+            userNameElement.textContent = "Erro ao conectar ao servidor";
+            userNameElement.style.color = "red";
         }
-
-        const data = await response.json();
-        loginMessage.textContent = `Bem-vindo, ${data.message}!`;
-        loginMessage.style.color = "green";
-
-        // Salva o token e redireciona para o profile
-        localStorage.setItem("token", data.token);
-        await loadComponent("pages", "profile");
-      } catch (error) {
-        console.error("Erro ao conectar:", error);
-        loginMessage.textContent = "Erro ao conectar ao servidor.";
-        loginMessage.style.color = "red";
-      }
     });
-  });
 }
 
-
 window.setupLoginEvents = setupLoginEvents;
-
 export { setupLoginEvents };

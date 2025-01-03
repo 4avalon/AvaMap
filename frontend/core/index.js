@@ -7,6 +7,7 @@ async function init() {
     console.log("[Init] Inicializando aplicação...");
 
     try {
+        await injectDynamics();
         // Carregar Navbar e Footer
         await loadComponent("globals", "nav");
         await loadComponent("globals", "footer");
